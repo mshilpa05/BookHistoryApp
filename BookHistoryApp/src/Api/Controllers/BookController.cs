@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Api.Controllers
 {
@@ -9,10 +10,12 @@ namespace Api.Controllers
     public class BookController : BaseController
     {
         private readonly IBookService _bookService;
+        private readonly IChangeHistoryService _changeHistoryService;
 
-        public BookController(IBookService bookService, ILogger<BookController> logger) : base(logger) 
+        public BookController(IBookService bookService, IChangeHistoryService changeHistoryService, ILogger<BookController> logger) : base(logger) 
         {
             _bookService = bookService;
+            _changeHistoryService = changeHistoryService;
         }
 
         [HttpGet("{id}")]
@@ -62,9 +65,8 @@ namespace Api.Controllers
         {
             try
             {
-                await _bookService.UpdateBook(id, bookUpdateDTO);
-                return HandleUpdateResponse(true);
-                // handle false cases
+                var updated = await _bookService.UpdateBook(id, bookUpdateDTO);
+                return HandleUpdateResponse(updated);
             }
             catch (Exception ex)
             {
@@ -85,6 +87,13 @@ namespace Api.Controllers
             {
                 return HandleError(ex);
             }
+        }
+
+        [HttpGet("{id}/change-history")]
+        public async Task<IActionResult> GetChangeHistory(string id)
+        {
+            var histories = await _changeHistoryService.GetChangeHistoriesByBookIdAsync(id);
+            return HandleResponse(histories);
         }
     }
 }

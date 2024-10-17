@@ -2,17 +2,20 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Application.Services
 {
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRepository;
+        private readonly IChangeHistoryRepository _changeHistoryRepository;
         private readonly IMapper _mapper;
 
-        public BookService(IBookRepository bookRepository, IMapper mapper)
+        public BookService(IBookRepository bookRepository, IChangeHistoryRepository changeHistoryRepository, IMapper mapper)
         {
             _bookRepository = bookRepository;
+            _changeHistoryRepository = changeHistoryRepository;
             _mapper = mapper;
         }
 
@@ -44,12 +47,21 @@ namespace Application.Services
             await _bookRepository.AddAsync(book);
         }
 
-        public async Task UpdateBook(string id, BookDTO bookUpdateDTO)
+        public async Task<bool> UpdateBook(string id, BookDTO bookUpdateDTO)
         {
-            var book = _mapper.Map<Book>(bookUpdateDTO);
-            book.Id = id;
-           
+            var book = await _bookRepository.GetByIdAsync(id);
+            if (book == null) return false;
+
+            book.Update(bookUpdateDTO.Title, bookUpdateDTO.Author, bookUpdateDTO.Description, bookUpdateDTO.PublishDate);
+
             await _bookRepository.UpdateAsync(book);
+
+            foreach (var change in book.ChangeHistories)
+            {
+                await _changeHistoryRepository.SaveChangeHistoryAsync(change);
+            }
+
+            return true;
         }
 
         public async Task DeleteBook(string id)

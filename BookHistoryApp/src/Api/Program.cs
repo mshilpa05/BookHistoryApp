@@ -4,6 +4,8 @@ using Infrastructure;
 using Application.Mappings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using BookHistoryApp.src.Application.Services;
+using BookHistoryApp.src.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +18,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=src/Infrastructure/Data/DB/BookHistory.db"));
 
 builder.Services.AddScoped<IBookService, BookService>(); 
-builder.Services.AddScoped<IBookRepository, BookRepository>(); 
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IChangeHistoryService, ChangeHistoryService>();
+builder.Services.AddScoped<IChangeHistoryRepository, ChangeHistoryRepository>();
 
 builder.Services.AddAutoMapper(typeof(BookMappingProfile).Assembly);
 
