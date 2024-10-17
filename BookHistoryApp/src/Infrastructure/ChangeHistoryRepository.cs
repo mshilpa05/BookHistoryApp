@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Models;
 using Domain.Entities;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +14,22 @@ namespace BookHistoryApp.src.Infrastructure
         {
             _context = context;
         }
-        public async Task<List<ChangeHistory>> GetHistoriesByBookIdAsync(string bookId)
+        public async Task<PagedResult<ChangeHistory>> GetHistoriesByBookIdAsync(string bookId, ChangeHistoryParameters changeHistoryParameters)
         {
-            return await _context.ChangeHistories.Where(ch => ch.BookId == bookId).ToListAsync();
+            var query = _context.ChangeHistories.Where(ch => ch.BookId == bookId).AsQueryable();
+            var totalRecords = await query.CountAsync();
+            var histories = await query
+                .Skip((changeHistoryParameters.PageNumber - 1) * changeHistoryParameters.PageSize)
+                .Take(changeHistoryParameters.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<ChangeHistory>
+            {
+                Items = histories,
+                TotalRecords = totalRecords,
+                Page = changeHistoryParameters.PageNumber,
+                PageSize = changeHistoryParameters.PageSize
+            };
         }
 
         public async Task SaveChangeHistoryAsync(ChangeHistory changeHistory)

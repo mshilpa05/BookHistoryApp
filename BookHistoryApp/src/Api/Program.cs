@@ -3,8 +3,6 @@ using Application.Services;
 using Infrastructure;
 using Application.Mappings;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using BookHistoryApp.src.Application.Services;
 using BookHistoryApp.src.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);

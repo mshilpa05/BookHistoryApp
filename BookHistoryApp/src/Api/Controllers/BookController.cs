@@ -1,7 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
+using Application.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Api.Controllers
 {
@@ -90,10 +90,15 @@ namespace Api.Controllers
         }
 
         [HttpGet("{id}/change-history")]
-        public async Task<IActionResult> GetChangeHistory(string id)
+        public async Task<IActionResult> GetChangeHistory(string id, [FromQuery] ChangeHistoryParameters changeHistoryParameters)
         {
-            var histories = await _changeHistoryService.GetChangeHistoriesByBookIdAsync(id);
+            if (changeHistoryParameters.EndYear < changeHistoryParameters.StartYear)
+            {
+                return BadRequest("EndYear cannot be earlier than start year");
+            }
+            var histories = await _changeHistoryService.GetChangeHistoriesByBookIdAsync(id, changeHistoryParameters);
             return HandleResponse(histories);
         }
     }
 }
+// TODO: scrap out base controller

@@ -2,7 +2,6 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Application.Services
 {

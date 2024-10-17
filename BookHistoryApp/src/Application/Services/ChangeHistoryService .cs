@@ -1,7 +1,8 @@
 ﻿using Application.Interfaces;
+using Application.Models;
 using Domain.Entities;
 
-namespace BookHistoryApp.src.Application.Services
+namespace Application.Services
 {
     public class ChangeHistoryService : IChangeHistoryService
     {
@@ -12,9 +13,9 @@ namespace BookHistoryApp.src.Application.Services
             _changeHistoryRepository = changeHistoryRepository;
         }
 
-        public async Task<List<ChangeHistory>> GetChangeHistoriesByBookIdAsync(string bookId)
+        public async Task<PagedResult<ChangeHistory>> GetChangeHistoriesByBookIdAsync(string bookId, ChangeHistoryParameters changeHistoryParameters)
         {
-            return await _changeHistoryRepository.GetHistoriesByBookIdAsync(bookId);
+            return await _changeHistoryRepository.GetHistoriesByBookIdAsync(bookId, changeHistoryParameters);
         }
     }
 }
