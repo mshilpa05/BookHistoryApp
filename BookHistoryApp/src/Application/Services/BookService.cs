@@ -38,12 +38,13 @@ namespace Application.Services
             return book.Select(book => _mapper.Map<BookViewDTO>(book));
         }
 
-        public async Task CreateBook(BookDTO bookCreateDTO)
+        public async Task<string> CreateBook(BookDTO bookCreateDTO)
         {
             var book = _mapper.Map<Book>(bookCreateDTO);
             book.Id = Guid.NewGuid().ToString();
 
             await _bookRepository.AddAsync(book);
+            return book.Id;
         }
 
         public async Task<bool> UpdateBook(string id, BookDTO bookUpdateDTO)
@@ -63,9 +64,17 @@ namespace Application.Services
             return true;
         }
 
-        public async Task DeleteBook(string id)
+        public async Task<bool> DeleteBook(string id)
         {
+            var book = await _bookRepository.GetByIdAsync(id);
+
+            if (book == null)
+            {
+                return false;
+            }
+
             await _bookRepository.DeleteAsync(id);
+            return true;
         }
     }
 }

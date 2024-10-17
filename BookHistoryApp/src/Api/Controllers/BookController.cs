@@ -1,21 +1,25 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BookController : BaseController
+    public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
         private readonly IChangeHistoryService _changeHistoryService;
+        private readonly ILogger _logger;
 
-        public BookController(IBookService bookService, IChangeHistoryService changeHistoryService, ILogger<BookController> logger) : base(logger) 
+        public BookController(IBookService bookService, IChangeHistoryService changeHistoryService, ILogger<BookController> logger)
         {
             _bookService = bookService;
             _changeHistoryService = changeHistoryService;
+            _logger = logger;   
         }
 
         [HttpGet("{id}")]
@@ -24,11 +28,19 @@ namespace Api.Controllers
             try
             {
                 var bookDto = await _bookService.GetBookByIdAsync(id);
-                return HandleResponse(bookDto);
+
+                if (bookDto == null)
+                {
+                    _logger.LogWarning("Requested resource not found.");
+                    return NotFound();
+                }
+
+                return Ok(bookDto);
             }
             catch (Exception ex)
             {
-                return HandleError(ex);
+                _logger.LogError(ex, "An error occurred during the request.");
+                return StatusCode(500, "An internal server error occurred.");
             }
         }
 
@@ -38,11 +50,20 @@ namespace Api.Controllers
             try
             {
                 var bookDtos = await _bookService.GetAllBookAsync();
-                return HandleResponse(bookDtos);
+
+                if (bookDtos == null)
+                {
+                    _logger.LogWarning("Database is empty");
+                    return NotFound();
+                }
+
+                _logger.LogInformation("Request handled successfully.");
+                return Ok(bookDtos);
             }
             catch (Exception ex)
             {
-                return HandleError(ex);
+                _logger.LogError(ex, "An error occurred during the request.");
+                return StatusCode(500, "An internal server error occurred.");
             }
         }
 
@@ -51,12 +72,18 @@ namespace Api.Controllers
         {
             try
             {
-                await _bookService.CreateBook(bookCreateDTO);
-                return HandleCreationResponse(bookCreateDTO, nameof(GetBookById));
+                var bookId = await _bookService.CreateBook(bookCreateDTO);
+
+                return Created(nameof(GetBookById), new
+                {
+                    Message = "Resource created successfully.",
+                    Data = bookId.ToString()
+                });
             }
             catch (Exception ex)
             {
-                return HandleError(ex);
+                _logger.LogError(ex, "An error occurred during the creation of book.");
+                return StatusCode(500, "An internal server error occurred.");
             }
         }
 
@@ -65,12 +92,24 @@ namespace Api.Controllers
         {
             try
             {
+                if (bookUpdateDTO == null)
+                {
+                    return BadRequest("Request body cannot be empty");
+                }
+
                 var updated = await _bookService.UpdateBook(id, bookUpdateDTO);
-                return HandleUpdateResponse(updated);
+
+                if (updated)
+                {
+                    return Ok(new { Message = "Resource updated successfully." });
+                }
+
+                return NotFound(new { Message = "Resource not found." });
             }
             catch (Exception ex)
             {
-                return HandleError(ex);
+                _logger.LogError(ex, "An error occurred during the request.");
+                return StatusCode(500, "An internal server error occurred.");
             }
         }
 
@@ -79,26 +118,49 @@ namespace Api.Controllers
         {
             try
             {
-                await _bookService.DeleteBook(id);
-                return HandleDeletionResponse(true);
-                // handle false cases
+                var isDeleted = await _bookService.DeleteBook(id);
+
+                if (isDeleted)
+                {
+                    return NoContent();
+                }
+
+                return NotFound(new { Message = "Resource not found." });
             }
             catch(Exception ex) 
             {
-                return HandleError(ex);
+                _logger.LogError(ex, "An error occurred during the request.");
+                return StatusCode(500, "An internal server error occurred.");
             }
         }
 
         [HttpGet("{id}/change-history")]
         public async Task<IActionResult> GetChangeHistory(string id, [FromQuery] ChangeHistoryParameters changeHistoryParameters)
         {
-            if (changeHistoryParameters.EndYear < changeHistoryParameters.StartYear)
+            try
             {
-                return BadRequest("EndYear cannot be earlier than start year");
+                if (changeHistoryParameters.EndYear < changeHistoryParameters.StartYear)
+                {
+                    return BadRequest("EndYear cannot be earlier than start year");
+                }
+
+                var histories = await _changeHistoryService.GetChangeHistoriesByBookIdAsync(id, changeHistoryParameters);
+
+                if (histories == null)
+                {
+                    _logger.LogWarning("Requested resource not found.");
+                    return NotFound();
+                }
+
+                _logger.LogInformation("Request handled successfully.");
+                return Ok(histories);
             }
-            var histories = await _changeHistoryService.GetChangeHistoriesByBookIdAsync(id, changeHistoryParameters);
-            return HandleResponse(histories);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during the request.");
+                return StatusCode(500, "An internal server error occurred.");
+            }
+            
         }
     }
 }
-// TODO: scrap out base controller

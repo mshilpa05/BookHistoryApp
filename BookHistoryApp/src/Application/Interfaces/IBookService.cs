@@ -8,9 +8,9 @@ namespace Application.Interfaces
 
         Task<IEnumerable<BookViewDTO>?> GetAllBookAsync();
 
-        Task CreateBook(BookDTO bookCreateDTO);
+        Task<string> CreateBook(BookDTO bookCreateDTO);
         Task<bool> UpdateBook(string id, BookDTO bookUpdateDTO);
-        Task DeleteBook(string id);
+        Task<bool> DeleteBook(string id);
 
     }
 }

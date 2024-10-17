@@ -16,11 +16,17 @@ namespace BookHistoryApp.src.Infrastructure
         }
         public async Task<PagedResult<ChangeHistory>> GetHistoriesByBookIdAsync(string bookId, ChangeHistoryParameters changeHistoryParameters)
         {
-            var query = _context.ChangeHistories.Where(ch => ch.BookId == bookId).AsQueryable();
+            var query = _context.ChangeHistories
+                .Where(ch => ch.BookId == bookId)
+                .Where(ch => ch.ChangeDate.Year >= changeHistoryParameters.StartYear && ch.ChangeDate.Year <= changeHistoryParameters.EndYear)
+                .AsQueryable();
+
             var totalRecords = await query.CountAsync();
+
             var histories = await query
                 .Skip((changeHistoryParameters.PageNumber - 1) * changeHistoryParameters.PageSize)
                 .Take(changeHistoryParameters.PageSize)
+                .OrderBy(ch => ch.ChangeDate)
                 .ToListAsync();
 
             return new PagedResult<ChangeHistory>
