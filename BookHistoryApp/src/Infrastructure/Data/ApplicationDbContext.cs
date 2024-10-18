@@ -13,16 +13,16 @@ namespace Infrastructure
         public DbSet<Book> Book { get; set; }
         public DbSet<ChangeHistory> ChangeHistories { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<ChangeHistory>()
-            .HasKey(ch => ch.Id); 
+        //    modelBuilder.Entity<ChangeHistory>()
+        //    .HasKey(ch => ch.Id); 
 
-            modelBuilder.Entity<ChangeHistory>()
-                .Property(ch => ch.Id)
-                .ValueGeneratedOnAdd();
-        }
+        //    modelBuilder.Entity<ChangeHistory>()
+        //        .Property(ch => ch.Id)
+        //        .ValueGeneratedOnAdd();
+        //}
     }
 }

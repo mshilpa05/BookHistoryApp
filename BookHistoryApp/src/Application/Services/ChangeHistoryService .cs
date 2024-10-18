@@ -17,5 +17,10 @@ namespace Application.Services
         {
             return await _changeHistoryRepository.GetHistoriesByBookIdAsync(bookId, changeHistoryParameters);
         }
+
+        public async Task<IEnumerable<ChangeHistoryGroupedByBookId>> GetChangeHistoryCountGroupedByBookIdAsync()
+        {
+            return await _changeHistoryRepository.GetCountOfChangesByBookId();
+        }
     }
 }

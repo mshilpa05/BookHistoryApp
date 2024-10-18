@@ -6,5 +6,7 @@ namespace Application.Interfaces
     public interface IChangeHistoryService
     {
         Task<PagedResult<ChangeHistory>> GetChangeHistoriesByBookIdAsync(string bookId, ChangeHistoryParameters changeHistoryParameters);
+
+        Task<IEnumerable<ChangeHistoryGroupedByBookId>> GetChangeHistoryCountGroupedByBookIdAsync();
     }
 }

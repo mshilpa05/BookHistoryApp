@@ -160,5 +160,28 @@ namespace Api.Controllers
             }
             
         }
+
+        [HttpGet("change-history")]
+        public async Task<IActionResult> GetChangeHistoryCountGroupedByBookId()
+        {
+            try
+            {
+                var changeHistories = await _changeHistoryService.GetChangeHistoryCountGroupedByBookIdAsync();
+                if (changeHistories == null)
+                {
+                    _logger.LogWarning("Requested resource not found.");
+                    return NotFound();
+                }
+
+                _logger.LogInformation("Request handled successfully.");
+                return Ok(changeHistories);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "An error occurred during the request.");
+                return StatusCode(500, "An internal server error occurred.");
+            }
+        }
     }
 }

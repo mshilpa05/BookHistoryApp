@@ -14,6 +14,7 @@ namespace BookHistoryApp.src.Infrastructure
         {
             _context = context;
         }
+
         public async Task<PagedResult<ChangeHistory>> GetHistoriesByBookIdAsync(string bookId, ChangeHistoryParameters changeHistoryParameters)
         {
             var query = _context.ChangeHistories
@@ -39,10 +40,11 @@ namespace BookHistoryApp.src.Infrastructure
             };
         }
 
-        public async Task SaveChangeHistoryAsync(ChangeHistory changeHistory)
+        public async Task<IEnumerable<ChangeHistoryGroupedByBookId>> GetCountOfChangesByBookId()
         {
-            await _context.ChangeHistories.AddAsync(changeHistory);
-            await _context.SaveChangesAsync();
+            return await _context.ChangeHistories.GroupBy(a => a.BookId) // Grouping
+                .Select(a => new ChangeHistoryGroupedByBookId { BookId = a.Key, ChangeHistoryLogCount = a.Count() })
+                .ToListAsync();
         }
     }
 }

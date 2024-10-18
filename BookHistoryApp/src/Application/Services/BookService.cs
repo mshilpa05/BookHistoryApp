@@ -56,10 +56,10 @@ namespace Application.Services
 
             await _bookRepository.UpdateAsync(book);
 
-            foreach (var change in book.ChangeHistories)
-            {
-                await _changeHistoryRepository.SaveChangeHistoryAsync(change);
-            }
+            //foreach (var change in book.ChangeHistories)
+            //{
+            //    await _changeHistoryRepository.SaveChangeHistoryAsync(change);
+            //}
 
             return true;
         }

@@ -6,6 +6,6 @@ namespace Application.Interfaces
     public interface IChangeHistoryRepository
     {
         Task<PagedResult<ChangeHistory>> GetHistoriesByBookIdAsync(string bookId, ChangeHistoryParameters changeHistoryParameters);
-        Task SaveChangeHistoryAsync(ChangeHistory changeHistory);
+        Task<IEnumerable<ChangeHistoryGroupedByBookId>> GetCountOfChangesByBookId();
     }
 }

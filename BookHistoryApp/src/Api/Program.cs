@@ -7,10 +7,17 @@ using BookHistoryApp.src.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Logging.AddConsole();
+
+builder.Configuration.SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "src/API"));
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllers();
 
 builder.Services.AddScoped<IBookService, BookService>(); 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
@@ -24,6 +31,12 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -32,6 +45,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-//app.UseAuthorization();
 app.MapControllers();
 app.Run();

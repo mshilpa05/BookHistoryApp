@@ -1,4 +1,7 @@
-﻿namespace Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace Domain.Entities
 {
     public class Book
     {
@@ -28,12 +31,13 @@
             if (Description != description)
             {
                 LogChange($"Description was changed from \"{Description}\" to \"{description}\"");
-                Author = author;
+                Description = description;
             }
 
             if (PublishDate != publishDate)
             {
                 LogChange($"PublishDate was changed from \"{PublishDate}\" to \"{publishDate}\"");
+                PublishDate = publishDate;
             }
         }
 
@@ -46,6 +50,8 @@
 
     public class ChangeHistory
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string BookId { get; set; }
         public string ChangeDescription { get; set; }
