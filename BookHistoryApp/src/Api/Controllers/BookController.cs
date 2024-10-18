@@ -178,7 +178,6 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-
                 _logger.LogError(ex, "An error occurred during the request.");
                 return StatusCode(500, "An internal server error occurred.");
             }
