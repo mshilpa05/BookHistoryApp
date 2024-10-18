@@ -1,9 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using Application.Models;
-using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Api.Controllers
 {

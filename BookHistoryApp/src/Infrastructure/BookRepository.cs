@@ -13,7 +13,7 @@ namespace Infrastructure
             _context = context;
         }
 
-        public async Task<Book> GetByIdAsync(string id)
+        public async Task<Book?> GetByIdAsync(string id)
         {
             return await _context.Book.FindAsync(id);
         }

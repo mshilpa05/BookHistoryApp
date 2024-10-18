@@ -8,9 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="src\Tests\**" />
+    <Compile Remove="ui\**" />
+    <Content Remove="src\Tests\**" />
+    <Content Remove="ui\**" />
+    <EmbeddedResource Remove="src\Tests\**" />
+    <EmbeddedResource Remove="ui\**" />
+    <None Remove="src\Tests\**" />
+    <None Remove="ui\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="src\Infrastructure\Data\DB\" />
-    <Folder Include="src\Tests\" />
-    <Folder Include="ui\BookHistoryApp.UI\" />
   </ItemGroup>
 
   <ItemGroup>

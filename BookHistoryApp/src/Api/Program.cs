@@ -26,17 +26,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage(); 
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Book History API V1"));
 }
 
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Book History API V1"));
 app.UseRouting();
-app.UseAuthorization();
+//app.UseAuthorization();
 app.MapControllers();
 app.Run();

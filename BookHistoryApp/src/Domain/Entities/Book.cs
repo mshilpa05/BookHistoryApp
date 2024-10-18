@@ -2,7 +2,7 @@
 {
     public class Book
     {
-        public string Id { get; set; } = String.Empty;
+        public string Id { get; set; } = string.Empty;
         public string? Title { get; set; }
         public string? Author { get; set; }
         public string? Description { get; set; }
@@ -11,7 +11,7 @@
         private readonly List<ChangeHistory> _changeHistories = new List<ChangeHistory>();
         public IReadOnlyList<ChangeHistory> ChangeHistories => _changeHistories.AsReadOnly();
 
-        public void Update(string title, string author, string description, DateTime publishDate)
+        public void Update(string? title, string? author, string? description, DateTime publishDate)
         {
             if (Title != title)
             {
